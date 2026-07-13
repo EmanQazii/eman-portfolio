@@ -4,10 +4,11 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
+import { colors } from './theme';
 
 function App() {
   return (
-    <main className="bg-[#0a0a0f] text-white min-h-screen">
+    <main className={`${colors.bg} ${colors.ink}`}>
       <Navbar />
       <Hero />
       <About />
@@ -15,7 +16,6 @@ function App() {
       <Projects />
       <Contact />
     </main>
-
   )
 }
 export default App;
