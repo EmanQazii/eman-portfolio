@@ -1,225 +1,171 @@
-import { motion } from "framer-motion";
-import { Layers, BrainCircuit, Workflow, Rocket } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Lightbulb, PenTool, Code2, Rocket, RefreshCw } from "lucide-react";
 import { colors, fonts } from "../theme";
-import { fadeUp } from '../animations';
+import { fadeUp } from "../animations";
+import SectionBackground from "./SectionBackground";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-const LIFECYCLE = [
-  { label: "IDEA", n: "01" },
-  { label: "SYSTEM DESIGN", n: "02" },
-  { label: "BACKEND", n: "03" },
-  { label: "FRONTEND", n: "04" },
-  { label: "DEPLOY", n: "05" },
-  { label: "ITERATE", n: "06" },
-];
-
-const CAPABILITIES = [
+/* five plain-language stages — accents cycle purple / orange / green */
+const STEPS = [
   {
+    icon: Lightbulb,
+    title: "Understand",
+    desc: "Frame the real problem before writing a single line of code.",
+    a: "orange",
+  },
+  {
+    icon: PenTool,
+    title: "Design",
+    desc: "Shape the architecture, data flow, and how it should feel to use.",
+    a: "purple",
+  },
+  {
+    icon: Code2,
     title: "Build",
-    icon: Layers,
-    description: "Full-stack applications, platforms and developer tools.",
-    tint: "bg-accent",
+    desc: "Engineer it end to end — backend, AI, and interface as one system.",
+    a: "green",
   },
   {
-    title: "Intelligence",
-    icon: BrainCircuit,
-    description: "ML systems, computer vision, AI integrations.",
-    tint: "bg-secondary",
-  },
-  {
-    title: "Automation",
-    icon: Workflow,
-    description: "Agent workflows, orchestration, business automation.",
-    tint: "bg-accent",
-  },
-  {
-    title: "Shipping",
     icon: Rocket,
-    description: "Deployment, monitoring, products used by real people.",
-    tint: "bg-secondary",
+    title: "Ship",
+    desc: "Deploy real products people can actually open and use.",
+    a: "orange",
+  },
+  {
+    icon: RefreshCw,
+    title: "Improve",
+    desc: "Measure how it performs, then iterate and make it better.",
+    a: "purple",
   },
 ];
 
+const ACCENTS = {
+  purple: { text: "text-accent", bg: "bg-accent", border: "hover:border-accent" },
+  orange: { text: "text-accent-orange", bg: "bg-accent-orange", border: "hover:border-accent-orange" },
+  green: { text: "text-accent-green", bg: "bg-accent-green", border: "hover:border-accent-green" },
+};
+
+const grid = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.14, delayChildren: 0.1 } },
+};
+const card = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 export default function About() {
-  return (
-    <section
-      className={`relative w-full flex flex-col justify-center px-6 py-20 overflow-hidden ${colors.bg}`}
-    >
-      {/* ambient accent glow, kept subtle */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-40 right-0 w-[520px] h-[520px] rounded-full opacity-[0.07] blur-3xl"
-        style={{ background: "radial-gradient(circle, var(--color-accent), transparent 70%)" }}
-      />
+  const reduce = useReducedMotion();
 
-      <div className="relative mx-auto w-full max-w-[1200px]">
-        {/* Section label */}
+  return (
+    <section className={`relative w-full overflow-hidden px-6 py-24 ${colors.bg}`}>
+      <SectionBackground tint="purple" />
+
+      <div className="relative z-10 mx-auto w-full max-w-[1100px]">
+        {/* label */}
         <motion.p
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
-          className={`${fonts.mono} ${colors.accentText} text-xs tracking-[0.3em] mb-6 flex items-center gap-3`}
+          className={`${fonts.mono} ${colors.accentText} mb-6 flex items-center gap-3 text-xs tracking-[0.3em]`}
         >
-          <span className="w-8 h-px bg-accent inline-block" />
-          PHILOSOPHY
+          <span className="inline-block h-px w-8 bg-accent" />
+          ABOUT ME
         </motion.p>
 
-        {/* Headline */}
+        {/* headline */}
         <motion.h2
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-          className={`${fonts.display} ${colors.ink} font-bold tracking-tight text-[42px] md:text-[56px] leading-[1.05] mb-14 max-w-3xl`}
+          className={`${fonts.display} ${colors.ink} mb-4 max-w-2xl text-[38px] font-bold leading-[1.05] tracking-tight md:text-[52px]`}
         >
           I build products,
           <br />
-          not just <span className={colors.accentText}>applications</span>.
+          not just applications.
         </motion.h2>
 
-        {/* Philosophy paragraph */}
         <motion.p
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.2 }}
-          className={`${fonts.body} ${colors.inkMuted} text-lg md:text-xl leading-relaxed max-w-2xl mb-[72px]`}
+          className={`${fonts.body} ${colors.inkMuted} mb-16 max-w-xl text-base leading-relaxed md:text-lg`}
         >
-          I work across backend systems, frontend experiences, machine learning
-          pipelines, and deployment infrastructure — bridging the gap between
-          idea and production.
+         I work across backend systems, frontend experiences, machine learning pipelines, and deployment infrastructure — bridging the gap between idea and production.
         </motion.p>
 
-        {/* Lifecycle visualization */}
-        <div className="mb-12">
-          {/* Desktop: horizontal track */}
-          <div className="hidden md:block relative pt-2 pb-6">
-            {/* base track */}
-            <div className={`absolute top-[27px] left-0 right-0 h-px ${colors.borderBg}`} />
-            {/* animated accent track */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 1.2, ease: EASE }}
-              style={{ originX: 0 }}
-              className="absolute top-[27px] left-0 right-0 h-px bg-accent"
-            />
-
-            <div className="relative flex justify-between">
-              {LIFECYCLE.map((stage, i) => (
-                <motion.div
-                  key={stage.label}
-                  className="group flex flex-col items-center gap-3 cursor-default"
-                  initial={{ opacity: 0, y: 14 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.5, ease: EASE, delay: i * 0.12 }}
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.15 }}
-                    transition={{ duration: 0.25, ease: EASE }}
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${
-                      i % 2 === 0 ? "bg-accent" : "bg-secondary"
-                    }`}
-                  >
-                    <span className={`${fonts.mono} text-xs font-medium text-on-dark`}>
-                      {stage.n}
-                    </span>
-                  </motion.div>
-                  <span
-                    className={`${fonts.mono} ${colors.inkMuted} text-[10px] tracking-[0.15em] text-center transition-colors duration-300 group-hover:text-accent`}
-                  >
-                    {stage.label}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile: vertical track */}
-          <div className="md:hidden relative pl-8">
-            <div className={`absolute left-[15px] top-2 bottom-2 w-px ${colors.borderBg}`} />
-            <motion.div
-              initial={{ scaleY: 0 }}
-              whileInView={{ scaleY: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 1.2, ease: EASE }}
-              style={{ originY: 0 }}
-              className="absolute left-[15px] top-2 bottom-2 w-px bg-accent"
-            />
-            <div className="flex flex-col gap-7">
-              {LIFECYCLE.map((stage, i) => (
-                <motion.div
-                  key={stage.label}
-                  className="relative flex items-center gap-4"
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.5, ease: EASE, delay: i * 0.1 }}
-                >
-                  <div
-                    className={`absolute -left-8 w-8 h-8 rounded-xl flex items-center justify-center shadow-sm ${
-                      i % 2 === 0 ? "bg-accent" : "bg-secondary"
-                    }`}
-                  >
-                    <span className={`${fonts.mono} text-[10px] font-medium text-on-dark`}>
-                      {stage.n}
-                    </span>
-                  </div>
-                  <span
-                    className={`${fonts.mono} ${colors.inkMuted} text-xs tracking-[0.15em]`}
-                  >
-                    {stage.label}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Capability cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-[48px]">
-          {CAPABILITIES.map(({ title, icon: Icon, description, tint }, i) => (
-            <motion.div
-              key={title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: EASE, delay: i * 0.1 }}
-              whileHover={{ y: -6 }}
-              className={`group relative border ${colors.border} bg-surface rounded-[20px] p-7 overflow-hidden transition-all duration-300 hover:border-accent hover:shadow-[0_16px_40px_rgba(10,126,140,0.12)]`}
-            >
-              {/* corner tint that blooms on hover */}
-              <div
-                aria-hidden="true"
-                className={`absolute -top-10 -right-10 w-32 h-32 rounded-full ${tint} opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-[0.15]`}
-              />
-
+        {/* ---------------- PROCESS FLOW ---------------- */}
+        <motion.div
+          variants={grid}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          className="relative"
+        >
+          {/* connecting line (desktop) */}
+          <div className="pointer-events-none absolute inset-x-0 top-7 hidden md:block">
+            <div className="relative mx-[10%] h-px bg-white/10">
               <motion.div
-                whileHover={{ rotate: 6, scale: 1.05 }}
-                transition={{ duration: 0.3, ease: EASE }}
-                className={`relative w-12 h-12 rounded-xl ${tint} flex items-center justify-center mb-6 shadow-sm`}
-              >
-                <Icon strokeWidth={1.75} className="w-5 h-5 text-on-dark" />
-              </motion.div>
+                className="absolute inset-y-0 left-0 bg-accent"
+                initial={{ width: "0%" }}
+                whileInView={{ width: "100%" }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, ease: EASE, delay: 0.3 }}
+              />
+            </div>
+          </div>
 
-              <h3
-                className={`relative ${fonts.display} ${colors.ink} font-semibold text-lg mb-2 transition-colors duration-300 group-hover:text-accent`}
-              >
-                {title}
-              </h3>
-              <p className={`relative ${fonts.body} ${colors.inkMuted} text-sm leading-relaxed`}>
-                {description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-5 md:gap-4">
+            {STEPS.map((step, i) => {
+              const Icon = step.icon;
+              const accent = ACCENTS[step.a];
+              return (
+                <motion.div
+                  key={step.title}
+                  variants={card}
+                  whileHover={{ y: -6 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                  className={`group relative flex flex-col items-center rounded-2xl border border-white/10 bg-surface-dark p-5 text-center transition-colors duration-300 ${accent.border}`}
+                >
+                  {/* step number */}
+                  <span
+                    className={`${fonts.mono} ${colors.inkFaint} absolute right-3 top-3 text-[10px] tracking-widest`}
+                  >
+                    0{i + 1}
+                  </span>
+
+                  {/* icon badge */}
+                  <div className="relative mb-4">
+                    {!reduce && (
+                      <motion.span
+                        className={`absolute inset-0 rounded-xl ${accent.bg}`}
+                        animate={{ scale: [1, 1.45], opacity: [0.3, 0] }}
+                        transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut", delay: i * 0.25 }}
+                      />
+                    )}
+                    <div className={`relative flex h-14 w-14 items-center justify-center rounded-xl ${accent.bg} shadow-lg`}>
+                      <Icon strokeWidth={1.75} className="h-6 w-6 text-on-dark" />
+                    </div>
+                  </div>
+
+                  <h3 className={`${fonts.display} ${colors.ink} mb-1.5 text-base font-bold`}>
+                    {step.title}
+                  </h3>
+                  <p className={`${fonts.body} ${colors.inkMuted} text-sm leading-relaxed`}>
+                    {step.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );
