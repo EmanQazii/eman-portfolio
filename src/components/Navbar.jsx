@@ -41,7 +41,7 @@ export default function Navbar() {
         className={`
           flex items-center gap-6 rounded-full
           border ${colors.border}
-          bg-surface/75
+          bg-surface-dark/85
           backdrop-blur-xl
           shadow-sm
           transition-all duration-300
@@ -53,7 +53,7 @@ export default function Navbar() {
           href="#"
           className={`flex items-center gap-2 whitespace-nowrap ${fonts.display}`}
         >
-          <span className={`h-2 w-2 rounded-full ${colors.accentBg}`} />
+          <span className={`h-2 w-2 rounded-full ${colors.accentGreenBg}`} />
 
           <span
             className={`text-sm font-bold tracking-[0.2em] uppercase ${colors.ink}`}
@@ -103,7 +103,7 @@ export default function Navbar() {
           download="Eman_Qazi_Resume.pdf"
           className={`
             rounded-full px-5 py-2 text-sm font-medium
-            ${colors.ctaPrimary}
+            ${colors.accentBg} ${colors.onDark}
           `}
         >
           Resume ↗

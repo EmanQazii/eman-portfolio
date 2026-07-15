@@ -1,5 +1,7 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useRef, useState } from 'react'
+import { fadeUp } from '../animations';
+import { colors, fonts } from "../theme";
 
 const ease = [0.22, 1, 0.36, 1]
 const ACCENT = '#0A7E8C'
@@ -672,18 +674,24 @@ export default function Projects() {
       style={{ backgroundColor: '#ffffff', padding: '120px 24px', fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '100px' }}>
-          <div style={{ fontFamily: 'monospace', fontSize: '14px', letterSpacing: '0.3em', color: ACCENT, marginBottom: '16px', fontWeight: 500 }}>
-            SELECTED WORK
-          </div>
+       {/* Section label */}
+<motion.p
+  variants={fadeUp}
+  initial="hidden"
+  whileInView="show"
+  viewport={{ once: true, amount: 0.3 }}
+  className={`${fonts.mono} ${colors.accentText} text-xs tracking-[0.3em] mb-6 flex items-center gap-3`}
+>
+  <span className="w-8 h-px bg-accent inline-block" />
+  SELECTED WORK
+</motion.p>
+          
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 700, color: '#0a0a0a', letterSpacing: '-1px', lineHeight: 1.1, marginBottom: '12px' }}>
             Products built from idea<br />to deployment.
           </h2>
           <p style={{ fontSize: '15px', color: '#888', maxWidth: '400px', lineHeight: 1.6 }}>
             End-to-end engineering — mobile, backend, AI, and automation.
           </p>
-        </div>
-
         {projects.map((project, i) => (
           <ProjectRow key={i} project={project} index={i} onOpen={setActiveProject} />
         ))}

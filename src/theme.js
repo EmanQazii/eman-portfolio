@@ -1,7 +1,3 @@
-// theme.js — single source of truth for colors and shared content.
-// Actual color values now live in index.css (@theme block).
-// Change a color there and it updates everywhere it's used here.
-
 export const colors = {
   // base surfaces
   bg: "bg-surface",
@@ -19,11 +15,21 @@ export const colors = {
   borderBg: "bg-ink/15",
   borderStrong: "border-ink/20",
 
-  // accent (used deliberately, one color only)
+  // primary accent (purple) — used deliberately, main accent
   accentBg: "bg-accent",
   accentText: "text-accent",
   accentBorderHover: "hover:border-accent",
   accentTextHover: "hover:text-accent",
+
+  // orange accent — sparing use (badges, highlights, hover states)
+  accentOrangeBg: "bg-accent-orange",
+  accentOrangeText: "text-accent-orange",
+  accentOrangeBorderHover: "hover:border-accent-orange",
+
+  // green accent — sparing use (success states, tags, alt highlights)
+  accentGreenBg: "bg-accent-green",
+  accentGreenText: "text-accent-green",
+  accentGreenBorderHover: "hover:border-accent-green",
 
   // secondary accent (tiny touches only, e.g. ticker dots)
   secondaryDot: "bg-secondary",
@@ -33,6 +39,20 @@ export const colors = {
   ctaPrimary: "bg-ink text-on-dark transition hover:bg-accent",
   ctaSecondary: "border border-ink/20 text-ink transition hover:border-ink",
   iconRail: "border border-ink/15 text-ink-muted transition-colors",
+
+  // solid colored chips — white text, border matches fill
+  chipGreen: "border border-accent-green bg-accent-green text-white transition-colors hover:bg-accent-green/80",
+chipOrange: "border border-accent-orange bg-accent-orange text-white transition-colors hover:bg-accent-orange/80",
+chipPurple: "border border-accent bg-accent text-white transition-colors hover:bg-accent/80",
+
+  // solid colored cards — same idea, larger surface
+  cardPurple: "border border-accent bg-accent text-white",
+  cardOrange: "border border-accent-orange bg-accent-orange text-white",
+  cardGreen: "border border-accent-green bg-accent-green text-white",
+
+  // card surface (white cards on black bg) — kept for cases you still want white cards
+  card: "bg-white text-ink",
+  cardMuted: "bg-white/95 text-ink",
 };
 
 export const fonts = {

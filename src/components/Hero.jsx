@@ -71,7 +71,7 @@ export default function Hero() {
       >
         {/* Name */}
         <motion.div variants={item} className="mb-4 flex items-center gap-2">
-          <span className={`inline-block h-2 w-2 ${colors.accentBg}`} />
+          <span className={`inline-block h-2 w-2 ${colors.accentOrangeBg}`} />
 
           <span
             className={`text-xl font-bold uppercase tracking-wide sm:text-2xl ${fonts.display} ${colors.ink}`}
@@ -85,7 +85,7 @@ export default function Hero() {
           {ROLES.map((role) => (
             <span
               key={role}
-              className={`rounded px-2.5 py-1 text-[11px] tracking-wide ${fonts.mono} ${colors.chip}`}
+              className={`rounded px-2.5 py-1 text-[11px] tracking-wide ${fonts.mono} ${colors.chipGreen}`}
             >
               {role}
             </span>
@@ -112,7 +112,7 @@ export default function Hero() {
       ease: [0.22, 1, 0.36, 1],
     }}
     style={{ originX: 0 }}
-    className={`absolute inset-0 ${colors.accentBg}`}
+    className={`absolute inset-0 ${colors.accentBg} z-0`}
   />
 
   {/* Text */}
@@ -168,7 +168,7 @@ export default function Hero() {
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             href="#projects"
-            className={`rounded-md px-6 py-3 text-sm font-semibold ${colors.ctaPrimary}`}
+            className={`rounded-md px-6 py-3 text-sm font-semibold ${colors.chipOrange}`}
           >
             View Projects →
           </motion.a>
@@ -177,7 +177,7 @@ export default function Hero() {
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             href="#contact"
-            className={`rounded-md px-6 py-3 text-sm font-semibold ${colors.ctaSecondary}`}
+            className={`rounded-md px-6 py-3 text-sm font-semibold ${colors.chipGreen}`}
           >
             Get in touch
           </motion.a>

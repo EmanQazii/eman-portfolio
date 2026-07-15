@@ -6,15 +6,17 @@
   --font-mono: "JetBrains Mono", monospace;
 
   /* colors — edit these to restyle the whole site */
-  --color-surface: #fafafa;       /* was neutral-50 */
-  --color-surface-dark: #171717;  /* was neutral-900 */
+  --color-surface: #18181B;       /* black bg, was #fafafa */
+  --color-surface-dark: #121212;  /* slightly deeper black for contrast sections */
 
-  --color-ink: #171717;           /* was neutral-900 */
-  --color-ink-muted: #525252;     /* was neutral-600 */
-  --color-ink-faint: #a3a3a3;     /* was neutral-400 */
-  --color-on-dark: #fafafa;       /* was neutral-50 */
-  --color-on-dark-muted: #e5e5e5; /* was neutral-200 */
+  --color-ink: #ffffff;           /* text on light-ish areas, now white */
+  --color-ink-muted: #cfcfd1;     /* muted white/gray */
+  --color-ink-faint: #8a8a8d;     /* faint gray */
+  --color-on-dark: #ffffff;       /* text on dark bg */
+  --color-on-dark-muted: #d4d4d6;
 
-  --color-accent: #0A7E8C;        /* was indigo-600  29ABB7*/
-  --color-secondary: #f59e0b;     /* was amber-500 */
+  --color-accent: #5D2586;        /* purple — primary accent */
+  --color-accent-orange: #F98128;
+  --color-accent-green: #50B848;
+  --color-secondary: #F98128;     /* secondary reuses orange, or pick one */
 }

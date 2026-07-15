@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Layers, BrainCircuit, Workflow, Rocket } from "lucide-react";
 import { colors, fonts } from "../theme";
+import { fadeUp } from '../animations';
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -40,15 +41,11 @@ const CAPABILITIES = [
   },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
-};
 
 export default function About() {
   return (
     <section
-      className={`relative w-full min-h-[80vh] flex flex-col justify-center px-6 md:px-16 py-24 md:py-32 overflow-hidden ${colors.bg}`}
+      className={`relative w-full flex flex-col justify-center px-6 py-20 overflow-hidden ${colors.bg}`}
     >
       {/* ambient accent glow, kept subtle */}
       <div
@@ -57,7 +54,7 @@ export default function About() {
         style={{ background: "radial-gradient(circle, var(--color-accent), transparent 70%)" }}
       />
 
-      <div className="relative mx-auto w-full max-w-5xl">
+      <div className="relative mx-auto w-full max-w-[1200px]">
         {/* Section label */}
         <motion.p
           variants={fadeUp}

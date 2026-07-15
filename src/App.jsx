@@ -14,9 +14,8 @@ function App() {
       <Navbar />
 
       <Hero />
-      <About />
       <Projects />
-
+      <About />
       <Experience />
 
       <TechStack />
