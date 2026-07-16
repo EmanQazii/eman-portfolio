@@ -1,28 +1,20 @@
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Projects from './components/Projects';
-import Experience from './components/Experience';
-import About from './components/About';
-import TechStack from './components/TechStack';
+import HowIWork from './components/HowIWork';
+import WhatIBuild from './components/WhatIBuild';
 import Contact from './components/Contact';
-import Footer from './components/Footer';
 import { colors } from './theme';
 
 function App() {
   return (
     <main className={`${colors.bg} ${colors.ink}`}>
       <Navbar />
-
       <Hero />
       <Projects />
-      <About />
-      <Experience />
-
-      <TechStack />
-
+      <HowIWork />
+      <WhatIBuild />
       <Contact />
-
-      <Footer />
     </main>
   );
 }

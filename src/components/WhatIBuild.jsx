@@ -40,7 +40,7 @@ export default function WhatIBuild() {
   const reduce = useReducedMotion();
 
   return (
-    <section id="what-i-build" className={`relative w-full overflow-hidden px-6 py-20 ${colors.bg}`}>
+    <section id="what-i-build" className={`relative w-full overflow-hidden px-6 py-[clamp(48px,10vw,80px)] ${colors.bg}`}>
       <SectionBackground tint="purple" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1100px]">
@@ -64,7 +64,7 @@ export default function WhatIBuild() {
           transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
           className={`${fonts.display} ${colors.ink} mb-10 max-w-2xl text-[30px] font-bold leading-[1.1] tracking-tight md:text-[42px]`}
         >
-          I build products — and I&apos;ve <span className={colors.accentText}>shipped</span> them.
+          Turning complexity into <span className={colors.accentText}>clarity.</span>
         </motion.h2>
 
         {/* what I build — solid color cards */}

@@ -1,5 +1,5 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { fadeUp } from '../animations'
 import { colors, fonts } from '../theme'
 import SectionBackground from './SectionBackground'
@@ -28,8 +28,10 @@ const projects = [
     title: 'Dietary Habit Tracker',
     type: 'mobile',
     description:
-      'A nutrition platform that identifies food from photos using a custom-trained image classifier and maps intake to USDA calorie data — real dietary intelligence without manual logging.',
+      'Turns a photo into a nutrition log. Trained, not templated. \n Identifies food from photos using a custom-trained CNN and maps intake to real USDA calorie data — no manual entry required.',
+    detail:"Most diet trackers rely on manual food logging — this doesn't. A MobileNetV2 classifier, trained from scratch on a 16,000-image dataset across 34 food classes, identifies meals directly from photos and reaches 77% validation accuracy. Detected foods are mapped to USDA FoodData Central for calorie estimation, with manual entry available as a fallback using serving-size-adjusted lookups.\n Backend built on FastAPI and PostgreSQL with stored procedures and triggers for analytics — daily calorie summaries, meal history trends, and dietary pattern insights are computed at the database layer, not bolted on in the app.\n Full pipeline: dataset curation → model training (Google Colab) → FastAPI serving layer → Flutter mobile client.",
     stack: 'Flutter · FastAPI · PostgreSQL · TensorFlow · USDA API',
+    metrics: '77% val accuracy · 34 food classes · 16K training images',
     links: [
       { label: 'Live Product', href: 'https://fooddiettracker.onrender.com' },
       { label: 'GitHub', href: 'https://github.com/EmanQazii/FoodDietTracker' },
@@ -58,8 +60,10 @@ const projects = [
     title: 'Cure Connect',
     type: 'mobile',
     description:
-      'A dual-role healthcare system connecting doctors and patients across hospitals — appointments, digital prescriptions, diagnostic records, and medication adherence in one platform.',
+      'A dual-role healthcare system connecting doctors and patients across hospitals — appointments, digital prescriptions, diagnostic records, and medication adherence tracking with real-time sync.',
     stack: 'Flutter · Firebase · Dart',
+    metrics: 'Real-time sync · Dual-role system · Multi-hospital support',
+    detail:"Built as a two-sided system rather than a single-user app. Doctors manage appointments, review patient history, and issue structured e-prescriptions (medication, dosage, frequency, tests) — all synced instantly to the patient side via Firebase real-time updates. \n On the patient side: search doctors by hospital, specialty, and rating; view and download prescriptions; and opt into a medication adherence tracker that sends scheduled reminders and logs daily check-ins against a prescribed treatment plan — closing the loop between what a doctor prescribes and what a patient actually follows through on.",
     links: [{ label: 'GitHub', href: 'https://github.com/EmanQazii/ClinincBookingApp' }],
     cover: '/media/projects/cure-connect/cover.jpeg',
     gallery: [
@@ -96,6 +100,8 @@ const projects = [
     description:
       'A cross-platform price intelligence tool that aggregates electronics listings from Amazon and Daraz, unifies them, and surfaces price trend analytics for smarter buying decisions.',
     stack: 'TypeScript · Node.js · Python · Selenium · BeautifulSoup',
+    detail:"Scrapes electronics listings from Amazon and Daraz on an automated schedule (GitHub Actions), then solves the harder problem: reconciling two sources that don't agree on names, formats, or IDs into one unified product record. Repeated scrapes of the same product feed a price-history model, so trend analytics (rising/falling price, cross-platform comparison) update over time instead of resetting on every run. \nHandled real-world scraping pain: frequent DOM/field changes on both source sites breaking selectors, inconsistent image delivery, and non-deterministic listing sets between runs — all required building resilience into the matching logic rather than assuming clean, stable input.",
+    metrics: 'Cross-platform price comparison · Price trend analytics · Automated scraping',
     links: [
       { label: 'Live Product', href: 'https://bazaarlenspriceanalysisplatform.netlify.app' },
       { label: 'GitHub', href: 'https://github.com/EmanQazii/BazaarLens-PriceAnalysisPlatform' },
@@ -122,8 +128,10 @@ const projects = [
     title: 'Hiring Workflow Automation',
     type: 'web',
     description:
-      'An agentic pipeline that parses resumes, scores candidates with an LLM, routes decisions across two hiring tracks, and auto-schedules interviews via Google Calendar — zero human intervention.',
+      'Resume in, decision out — scored, routed, and scheduled with zero manual review.\n An agentic pipeline that parses resumes, scores candidates with an LLM, routes decisions across two hiring tracks, and auto-schedules interviews via Google Calendar.',
     stack: 'n8n · Mistral AI · Google Calendar API',
+    metrics: 'Automated resume scoring · Conditional branching logic · Auto-scheduling interviews',
+    detail:"Built and tested end-to-end on sample resume batches across two distinct hiring tracks (Software Engineer and Business Manager), each parsed and scored against track-specific criteria using the Mistral AI API. Score thresholds drive branching logic: reject, flag for manual hiring-manager review, or auto-advance to interview — the top tier triggers automatic email dispatch and Google Calendar scheduling with no human in the loop.\n Solved for score consistency across two very different resume types (technical vs. managerial) feeding into one unified results sheet, plus handling conditional edge cases in the branching logic (e.g., borderline scores, missing fields) without breaking the pipeline.",
     links: [{ label: 'GitHub', href: 'https://github.com/EmanQazii/Automated-Hiring-Workflow-n8n' }],
     cover: '/media/projects/hiring-automation/cover.PNG',
     gallery: [],
@@ -140,6 +148,26 @@ const gridStagger = {
 const cardIn = {
   hidden: { opacity: 0, y: 34 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
+}
+
+/* ---------- responsive column-count hook (for modal screenshot grid) ---------- */
+function useColumns(type) {
+  const [cols, setCols] = useState(type === 'mobile' ? 3 : 1)
+
+  useEffect(() => {
+    if (type !== 'mobile') return
+    const calc = () => {
+      const w = window.innerWidth
+      if (w < 480) setCols(1)
+      else if (w < 768) setCols(2)
+      else setCols(3)
+    }
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
+  }, [type])
+
+  return cols
 }
 
 /* ---------- compact card ---------- */
@@ -161,7 +189,7 @@ function ProjectCard({ project, index, onOpen }) {
       {/* cover */}
       <div
         onClick={hasExtras ? () => onOpen(project) : undefined}
-        className={`relative w-full overflow-hidden ${hasExtras ? 'cursor-pointer' : ''}`}
+        className={`project-cover relative w-full overflow-hidden ${hasExtras ? 'cursor-pointer' : ''}`}
         style={{ aspectRatio: '16/10' }}
       >
         {project.cover ? (
@@ -249,9 +277,11 @@ function ProjectCard({ project, index, onOpen }) {
   )
 }
 
-/* ---------- modal (unchanged) ---------- */
+/* ---------- modal (responsive) ---------- */
 function ProjectModal({ project, onClose }) {
   const [index, setIndex] = useState(0)
+  const cols = useColumns(project?.type)
+
   if (!project) return null
 
   const images =
@@ -266,7 +296,7 @@ function ProjectModal({ project, onClose }) {
     color: INK, background: 'none', border: '1px solid var(--color-ink-faint)',
     borderRadius: '6px', padding: '6px 12px', cursor: 'pointer',
   }
-  const step = project.type === 'mobile' ? 3 : 1
+  const step = project.type === 'mobile' ? cols : 1
 
   return (
     <motion.div
@@ -277,7 +307,7 @@ function ProjectModal({ project, onClose }) {
       style={{
         position: 'fixed', inset: 0,
         background: 'color-mix(in srgb, var(--color-surface-dark) 85%, transparent)',
-        zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px',
+        zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(8px, 3vw, 24px)',
       }}
     >
       <motion.div
@@ -286,34 +316,34 @@ function ProjectModal({ project, onClose }) {
         exit={{ scale: 0.96, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: SURFACE, borderRadius: '24px', width: 'min(1400px,95vw)',
-          height: '92vh', overflowY: 'auto', padding: '56px', color: INK,
+          background: SURFACE, borderRadius: '20px', width: 'min(1400px,95vw)',
+          height: '92vh', overflowY: 'auto', padding: 'clamp(20px, 6vw, 56px)', color: INK,
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '24px', fontWeight: 700, color: INK, margin: 0 }}>{project.title}</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '20px', gap: '12px' }}>
+          <h3 style={{ fontSize: 'clamp(18px, 4vw, 24px)', fontWeight: 700, color: INK, margin: 0 }}>{project.title}</h3>
           <button
             onClick={onClose}
-            style={{ fontFamily: 'monospace', fontSize: '13px', color: INK_MUTED, background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ fontFamily: 'monospace', fontSize: '13px', color: INK_MUTED, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}
           >
             CLOSE ✕
           </button>
         </div>
 
-        <div style={{ marginBottom: '48px' }}>
+        <div style={{ marginBottom: 'clamp(28px, 6vw, 48px)' }}>
           <div style={{ fontFamily: 'monospace', fontSize: '12px', letterSpacing: '0.2em', color: ACCENT, marginBottom: '14px' }}>
             {project.category}
           </div>
-          <p style={{ fontSize: '16px', lineHeight: 1.8, color: INK_MUTED, maxWidth: '900px', marginBottom: '28px' }}>
-            {project.description}
+          <p style={{ fontSize: 'clamp(14px, 3.6vw, 16px)', lineHeight: 1.8, color: INK_MUTED, maxWidth: '900px', marginBottom: '28px' }}>
+            {project.detail}
           </p>
-          <div style={{ fontSize: '14px', color: INK_FAINT, lineHeight: 1.8, marginBottom: '24px' }}>
-            {project.stack}
+          <div style={{ fontSize: '13px', color: INK_FAINT, lineHeight: 1.8, marginBottom: '24px' }}>
+            {project.metrics}
           </div>
         </div>
 
         {project.videos?.length > 0 && (
-          <div style={{ marginBottom: '56px' }}>
+          <div style={{ marginBottom: 'clamp(32px, 7vw, 56px)' }}>
             <div style={{ fontFamily: 'monospace', fontSize: '12px', letterSpacing: '0.2em', color: ACCENT, marginBottom: '24px' }}>
               DEMOS
             </div>
@@ -322,9 +352,9 @@ function ProjectModal({ project, onClose }) {
                 display: 'grid',
                 gridTemplateColumns:
                   project.type === 'mobile'
-                    ? `repeat(${Math.min(project.videos.length, 2)}, 1fr)`
+                    ? `repeat(${Math.min(project.videos.length, cols < 2 ? 1 : 2)}, 1fr)`
                     : '1fr',
-                gap: '32px', alignItems: 'start',
+                gap: '24px', alignItems: 'start',
               }}
             >
               {project.videos.map((video, i) => (
@@ -360,7 +390,7 @@ function ProjectModal({ project, onClose }) {
         )}
 
         {images.length > 0 && (
-          <div style={{ marginTop: '48px' }}>
+          <div style={{ marginTop: 'clamp(28px, 6vw, 48px)' }}>
             <div style={{ fontFamily: 'monospace', fontSize: '12px', letterSpacing: '0.22em', color: ACCENT, marginBottom: '20px', fontWeight: 600 }}>
               SCREENSHOTS
             </div>
@@ -369,18 +399,19 @@ function ProjectModal({ project, onClose }) {
                 position: 'relative', width: '100%', borderRadius: '18px', overflow: 'hidden',
                 background: SURFACE, border: '1px solid var(--color-ink-faint)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: project.type === 'mobile' ? '16px' : '0',
               }}
             >
               {project.type === 'mobile' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '20px' }}>
-                  {images.slice(index, index + 3).map((img, i) => (
-                    <div key={i} style={{ background: SURFACE, borderRadius: '24px', overflow: 'hidden', border: '1px solid var(--color-ink-faint)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols},1fr)`, gap: '16px', width: '100%' }}>
+                  {images.slice(index, index + cols).map((img, i) => (
+                    <div key={i} style={{ background: SURFACE, borderRadius: '20px', overflow: 'hidden', border: '1px solid var(--color-ink-faint)' }}>
                       <img src={img} alt="" style={{ width: '100%', aspectRatio: '9/11', objectFit: 'contain' }} />
                     </div>
                   ))}
                 </div>
               ) : (
-                <div style={{ background: SURFACE, borderRadius: '16px', overflow: 'hidden' }}>
+                <div style={{ background: SURFACE, borderRadius: '16px', overflow: 'hidden', width: '100%' }}>
                   <img src={images[index]} alt="" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }} />
                 </div>
               )}
@@ -397,7 +428,7 @@ function ProjectModal({ project, onClose }) {
                 </button>
                 <span style={{ fontFamily: 'monospace', fontSize: '12px', color: INK_FAINT, letterSpacing: '0.08em' }}>
                   {project.type === 'mobile'
-                    ? `${Math.min(index + 1, images.length)}-${Math.min(index + 3, images.length)} / ${images.length}`
+                    ? `${Math.min(index + 1, images.length)}-${Math.min(index + cols, images.length)} / ${images.length}`
                     : `${index + 1} / ${images.length}`}
                 </span>
                 <button
@@ -423,8 +454,15 @@ export default function Projects() {
     <section
       id="projects"
       className="relative overflow-hidden"
-      style={{ backgroundColor: SURFACE, padding: '120px 24px', fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
+      style={{ backgroundColor: SURFACE, padding: 'clamp(56px, 12vw, 120px) 20px', fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
     >
+      {/* scoped responsive tweaks that inline styles can't express */}
+      <style>{`
+        @media (max-width: 480px) {
+          .project-cover { aspect-ratio: 16/11; }
+        }
+      `}</style>
+
       {/* shared animated backdrop */}
       <SectionBackground tint="purple" />
 

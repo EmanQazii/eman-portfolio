@@ -179,10 +179,10 @@ export default function Hero() {
           {/* Hook */}
           <motion.h1
             variants={item}
-            className={`text-5xl font-bold uppercase leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.6rem] ${fonts.display}`}
+            className={`text-5xl font-bold uppercase leading-[1.05] tracking-tight sm:text-4xl lg:text-[5.0rem] ${fonts.display}`}
           >
-            <span className={`block ${colors.inkMuted}`}>Most people</span>
-            <span className="block">build projects.</span>
+            <span className={`block ${colors.inkMuted}`}>Ideas into </span>
+            <span className="block">code.</span>
             <span className="mt-2 inline-block">
               <span className="relative inline-block overflow-hidden align-top">
                 <motion.span
@@ -198,7 +198,7 @@ export default function Hero() {
                   transition={{ delay: 1, duration: 0.3 }}
                   className={`relative z-10 inline-block px-3 py-1 ${colors.onDark}`}
                 >
-                  I build products.
+                  Code into impact.
                 </motion.span>
               </span>
             </span>
@@ -292,7 +292,7 @@ function IconSlot({ slot, index, reduceMotion }) {
     if (reduceMotion) return;
     const start = setTimeout(() => {
       const id = setInterval(() => {
-        setI((prev) => (prev + SLOTS.length) % TECH_ICONS.length);
+        setI((prev) => (prev + 1) % TECH_ICONS.length);
       }, slot.every);
       // store on element via closure cleanup
       cleanup.current = () => clearInterval(id);

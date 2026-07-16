@@ -59,7 +59,9 @@ export default function About() {
   const reduce = useReducedMotion();
 
   return (
-    <section className={`relative w-full overflow-hidden px-6 py-24 ${colors.bg}`}>
+    <section 
+    id="how-i-work"
+    className={`relative w-full overflow-hidden px-6 py-[clamp(56px,12vw,96px)] ${colors.bg}`}>
       <SectionBackground tint="purple" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1100px]">
@@ -72,7 +74,7 @@ export default function About() {
           className={`${fonts.mono} ${colors.accentText} mb-6 flex items-center gap-3 text-xs tracking-[0.3em]`}
         >
           <span className="inline-block h-px w-8 bg-accent" />
-          ABOUT ME
+          HOW I WORK
         </motion.p>
 
         {/* headline */}
@@ -84,7 +86,7 @@ export default function About() {
           transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
           className={`${fonts.display} ${colors.ink} mb-4 max-w-2xl text-[38px] font-bold leading-[1.05] tracking-tight md:text-[52px]`}
         >
-          I build products,
+          I build <span className={colors.accentText}>products,</span>
           <br />
           not just applications.
         </motion.h2>

@@ -1,35 +1,35 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import emailjs from "@emailjs/browser";
 import { GithubIcon, LinkedinIcon } from "./Icons";
-import { ArrowUpRight, Send } from "lucide-react";
+import { ArrowUpRight, Send, Check, AlertCircle } from "lucide-react";
 import { colors, fonts } from "../theme";
 import { fadeUp } from "../animations";
 import SectionBackground from "./SectionBackground";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-function Field({ id, label, type = "text", textarea = false, value, onChange }) {
+function Field({ id, label, type = "text", textarea = false, value, onChange, placeholder }) {
   const [focused, setFocused] = useState(false);
-  const active = focused || value.length > 0;
+  const fieldClasses = `${fonts.body} ${colors.ink} w-full rounded-2xl border bg-[#232327] px-5 py-4 text-sm outline-none transition-colors placeholder:text-ink-faint ${
+    focused ? "border-accent" : "border-[#3a3a3f]"
+  }`;
+
   return (
-    <div className="relative">
-      <label
-        htmlFor={id}
-        className={`${fonts.mono} pointer-events-none absolute left-0 text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
-          active ? "-top-1 text-accent" : "top-3 text-ink-faint"
-        }`}
-      >
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className={`${fonts.mono} ${colors.inkMuted} text-[11px] uppercase tracking-[0.2em]`}>
         {label}
       </label>
       {textarea ? (
         <textarea
           id={id}
-          rows={3}
+          rows={4}
           value={value}
           onChange={onChange}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className={`${fonts.body} ${colors.ink} w-full resize-none border-b border-white/15 bg-transparent pb-2 pt-4 text-base outline-none transition-colors focus:border-accent`}
+          placeholder={placeholder}
+          className={`${fieldClasses} resize-none`}
         />
       ) : (
         <input
@@ -39,16 +39,10 @@ function Field({ id, label, type = "text", textarea = false, value, onChange }) 
           onChange={onChange}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className={`${fonts.body} ${colors.ink} w-full border-b border-white/15 bg-transparent pb-2 pt-4 text-base outline-none transition-colors focus:border-accent`}
+          placeholder={placeholder}
+          className={fieldClasses}
         />
       )}
-      {/* animated underline accent */}
-      <motion.span
-        className="absolute bottom-0 left-0 h-px bg-accent"
-        initial={false}
-        animate={{ width: focused ? "100%" : "0%" }}
-        transition={{ duration: 0.4, ease: EASE }}
-      />
     </div>
   );
 }
@@ -56,11 +50,31 @@ function Field({ id, label, type = "text", textarea = false, value, onChange }) 
 export default function Contact() {
   const reduce = useReducedMotion();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState("idle"); // idle | sending | success | error
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const mailto = `mailto:emanqazi786@gmail.com?subject=${encodeURIComponent(
-    form.name ? `Hello from ${form.name}` : "Let's build something"
-  )}&body=${encodeURIComponent(form.message + (form.email ? `\n\n— ${form.email}` : ""))}`;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("sending");
+
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+        },
+        { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY }
+      );
+      setStatus("success");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      setStatus("error");
+    }
+  };
 
   return (
     <section id="contact" className={`relative w-full overflow-hidden px-6 py-24 ${colors.bg}`}>
@@ -74,10 +88,12 @@ export default function Contact() {
               <line x1="0" y1={y} x2="100" y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth="0.15" vectorEffect="non-scaling-stroke" />
               {!reduce && (
                 <motion.circle
+                  cx="0"
                   r="0.5"
                   cy={y}
                   fill={i === 0 ? "var(--color-accent)" : "var(--color-accent-orange)"}
                   vectorEffect="non-scaling-stroke"
+                  initial={{ cx: "0" }}
                   animate={{ cx: ["0", "100"] }}
                   transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "linear", delay: i * 1.5 }}
                 />
@@ -115,7 +131,7 @@ export default function Contact() {
           whileInView="show"
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-          className={`${fonts.display} ${colors.ink} mb-6 text-[13vw] font-bold uppercase leading-[0.92] tracking-tight sm:text-[10vw] lg:text-[7.5rem]`}
+          className={`${fonts.display} ${colors.ink} mb-6 text-[10vw] font-bold uppercase leading-[0.92] tracking-tight sm:text-[7vw] lg:text-[5.5rem]`}
         >
           Let&apos;s build
           <br />
@@ -142,27 +158,44 @@ export default function Contact() {
             whileInView="show"
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              window.location.href = mailto;
-            }}
+            onSubmit={handleSubmit}
             className="flex flex-col gap-9"
           >
-            <Field id="name" label="Your Name" value={form.name} onChange={set("name")} />
-            <Field id="email" label="Email Address" type="email" value={form.email} onChange={set("email")} />
-            <Field id="message" label="Message" textarea value={form.message} onChange={set("message")} />
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Field id="name" label="Name" placeholder="Your Name" value={form.name} onChange={set("name")} />
+              <Field id="email" label="Email" type="email" placeholder="your@email.com" value={form.email} onChange={set("email")} />
+            </div>
+            <Field id="message" label="Message" textarea placeholder="Message" value={form.message} onChange={set("message")} />
 
             <motion.button
               type="submit"
+              disabled={status === "sending"}
               whileHover={{ y: -3 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 320, damping: 18 }}
-              className={`${fonts.mono} group relative mt-2 inline-flex w-fit items-center gap-3 overflow-hidden rounded-full bg-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-on-dark shadow-lg shadow-accent/30 transition-shadow hover:shadow-xl hover:shadow-accent/50`}
+              className={`${fonts.mono} group relative mt-2 inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-on-dark shadow-lg shadow-accent/30 transition-shadow hover:shadow-xl hover:shadow-accent/50 disabled:opacity-60 disabled:cursor-not-allowed`}
             >
               <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-              <span className="relative">Send Message</span>
-              <Send strokeWidth={2} className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <span className="relative">
+                {status === "sending" ? "Sending..." : status === "success" ? "Sent!" : "Send Message"}
+              </span>
+              {status === "success" ? (
+                <Check strokeWidth={2} className="relative h-4 w-4" />
+              ) : (
+                <Send strokeWidth={2} className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              )}
             </motion.button>
+
+            {status === "success" && (
+              <p className={`${fonts.mono} text-xs text-accent-green flex items-center gap-2`}>
+                <Check className="h-3.5 w-3.5" /> Message sent — I'll get back to you soon.
+              </p>
+            )}
+            {status === "error" && (
+              <p className={`${fonts.mono} text-xs text-red-400 flex items-center gap-2`}>
+                <AlertCircle className="h-3.5 w-3.5" /> Something went wrong. Try emailing me directly below.
+              </p>
+            )}
           </motion.form>
 
           {/* CONTACT BLOCK */}
@@ -179,8 +212,8 @@ export default function Contact() {
               <span className={`${fonts.mono} ${colors.inkFaint} mb-3 block text-[11px] uppercase tracking-[0.2em]`}>
                 Or email directly
               </span>
-              <a
-                href="mailto:emanqazi786@gmail.com"
+              
+              <a  href="mailto:emanqazi786@gmail.com"
                 className={`${fonts.display} group inline-flex items-center gap-2 text-xl font-bold ${colors.ink} transition-colors hover:text-accent sm:text-2xl`}
               >
                 emanqazi786@gmail.com
@@ -190,8 +223,8 @@ export default function Contact() {
 
             {/* social links */}
             <div className="flex flex-col gap-px border-t border-white/10">
-              <a
-                href="https://github.com/EmanQazii"
+              
+              <a  href="https://github.com/EmanQazii"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${fonts.mono} group flex items-center justify-between border-b border-white/10 py-4 text-sm tracking-wide ${colors.inkMuted} transition-colors hover:text-accent-orange`}
@@ -202,8 +235,8 @@ export default function Contact() {
                 </span>
                 <ArrowUpRight strokeWidth={2} className="h-4 w-4 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
               </a>
-              <a
-                href="https://linkedin.com/in/eman-qazi"
+              
+             <a    href="https://linkedin.com/in/eman-qazi"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${fonts.mono} group flex items-center justify-between border-b border-white/10 py-4 text-sm tracking-wide ${colors.inkMuted} transition-colors hover:text-accent-green`}
@@ -218,7 +251,7 @@ export default function Contact() {
 
             {/* subtle education context */}
             <p className={`${fonts.mono} ${colors.inkFaint} mt-auto text-[11px] leading-relaxed tracking-[0.12em]`}>
-              BS COMPUTER SCIENCE · AIR UNIVERSITY · 2023–2027 · GPA: 3.81
+              BS COMPUTER SCIENCE · AIR UNIVERSITY · 2023–2027 · GPA:3.81
             </p>
           </motion.div>
         </div>
