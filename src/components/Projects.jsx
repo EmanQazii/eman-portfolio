@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import { fadeUp } from '../animations'
 import { colors, fonts } from '../theme'
 import SectionBackground from './SectionBackground'
-import { preloadProjectAssets } from '../preloadProjectAssets'
+import { preloadProjectAssets, preloadAllProjects } from '../preloadProjectAssets'
 
 const ease = [0.22, 1, 0.36, 1]
 const ACCENT = 'var(--color-accent)'
@@ -151,6 +151,20 @@ const cardIn = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
 }
 
+/* ---------- helper: load + decode an image so a src swap is instant ---------- */
+function decodeImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.src = src
+    if (img.decode) {
+      img.decode().then(resolve).catch(resolve)
+    } else {
+      img.onload = resolve
+      img.onerror = resolve
+    }
+  })
+}
+
 /* ---------- responsive column-count hook (for modal screenshot grid) ---------- */
 function useColumns(type) {
   const [cols, setCols] = useState(type === 'mobile' ? 3 : 1)
@@ -180,8 +194,7 @@ function ProjectCard({ project, index, onOpen }) {
   const accentBorder = ACCENT_BORDER[index % ACCENT_BORDER.length]
   const stackItems = project.stack.split('·').map((s) => s.trim())
 
-  // fire preloading at the earliest possible pre-event (hover/focus/touch),
-  // and again on click as a safety net. preloadProjectAssets de-dupes internally.
+  // safety-net preload (assets are already warmed on mount, this de-dupes)
   const startPreload = hasExtras ? () => preloadProjectAssets(project) : undefined
 
   return (
@@ -307,6 +320,13 @@ function ProjectModal({ project, onClose }) {
   }
   const step = project.type === 'mobile' ? cols : 1
 
+  // decode target images before advancing so the swap is instant, not gradual
+  const goTo = async (next) => {
+    const clamped = Math.max(0, Math.min(images.length - step, next))
+    await Promise.all(images.slice(clamped, clamped + step).map(decodeImage))
+    setIndex(clamped)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -377,13 +397,13 @@ function ProjectModal({ project, onClose }) {
                       }}
                     >
                       <video
-                        src={video} controls preload="auto"
+                        src={video} controls preload="metadata"
                         style={{ width: '100%', maxHeight: '520px', objectFit: 'contain', borderRadius: '24px', background: SURFACE_DARK, display: 'block' }}
                       />
                     </div>
                   ) : (
                     <video
-                      src={video} controls preload="auto"
+                      src={video} controls preload="metadata"
                       style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '18px', background: SURFACE_DARK, border: '1px solid var(--color-ink-faint)' }}
                     />
                   )}
@@ -429,7 +449,7 @@ function ProjectModal({ project, onClose }) {
             {images.length > step && (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '18px' }}>
                 <button
-                  onClick={() => setIndex(Math.max(0, index - step))}
+                  onClick={() => goTo(index - step)}
                   disabled={index === 0}
                   style={{ ...navBtnStyle, opacity: index === 0 ? 0.4 : 1, cursor: index === 0 ? 'not-allowed' : 'pointer' }}
                 >
@@ -441,7 +461,7 @@ function ProjectModal({ project, onClose }) {
                     : `${index + 1} / ${images.length}`}
                 </span>
                 <button
-                  onClick={() => setIndex(Math.min(images.length - step, index + step))}
+                  onClick={() => goTo(index + step)}
                   disabled={index >= images.length - step}
                   style={{ ...navBtnStyle, opacity: index >= images.length - step ? 0.4 : 1, cursor: index >= images.length - step ? 'not-allowed' : 'pointer' }}
                 >
@@ -458,6 +478,18 @@ function ProjectModal({ project, onClose }) {
 
 export default function Projects() {
   const [activeProject, setActiveProject] = useState(null)
+
+  // warm all project assets (images decoded first, then videos) as soon as
+  // the section mounts, during browser idle time so it doesn't block render
+  useEffect(() => {
+    const run = () => preloadAllProjects(projects)
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(run)
+      return () => cancelIdleCallback(id)
+    }
+    const t = setTimeout(run, 300)
+    return () => clearTimeout(t)
+  }, [])
 
   return (
     <section
