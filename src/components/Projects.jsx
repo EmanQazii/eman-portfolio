@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import { fadeUp } from '../animations'
 import { colors, fonts } from '../theme'
 import SectionBackground from './SectionBackground'
+import { preloadProjectAssets } from '../preloadProjectAssets'
 
 const ease = [0.22, 1, 0.36, 1]
 const ACCENT = 'var(--color-accent)'
@@ -108,16 +109,16 @@ const projects = [
     ],
     cover: '/media/projects/bazaarlens/cover.png',
     gallery: [
-      'media/projects/bazaarlens/shot1.png',
-      'media/projects/bazaarlens/shot2.png',
-      'media/projects/bazaarlens/shot3.png',
-      'media/projects/bazaarlens/shot4.png',
-      'media/projects/bazaarlens/shot5.png',
-      'media/projects/bazaarlens/shot6.png',
-      'media/projects/bazaarlens/shot7.png',
-      'media/projects/bazaarlens/shot8.png',
-      'media/projects/bazaarlens/shot9.png',
-      'media/projects/bazaarlens/shot10.png',
+      '/media/projects/bazaarlens/shot1.png',
+      '/media/projects/bazaarlens/shot2.png',
+      '/media/projects/bazaarlens/shot3.png',
+      '/media/projects/bazaarlens/shot4.png',
+      '/media/projects/bazaarlens/shot5.png',
+      '/media/projects/bazaarlens/shot6.png',
+      '/media/projects/bazaarlens/shot7.png',
+      '/media/projects/bazaarlens/shot8.png',
+      '/media/projects/bazaarlens/shot9.png',
+      '/media/projects/bazaarlens/shot10.png',
     ],
     videos: ['/media/projects/bazaarlens/demo-bazarlens.mp4'],
     imageAlt: 'BazaarLens Price Tracker',
@@ -179,16 +180,24 @@ function ProjectCard({ project, index, onOpen }) {
   const accentBorder = ACCENT_BORDER[index % ACCENT_BORDER.length]
   const stackItems = project.stack.split('·').map((s) => s.trim())
 
+  // fire preloading at the earliest possible pre-event (hover/focus/touch),
+  // and again on click as a safety net. preloadProjectAssets de-dupes internally.
+  const startPreload = hasExtras ? () => preloadProjectAssets(project) : undefined
+
   return (
     <motion.article
       variants={cardIn}
       whileHover={{ y: -6 }}
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+      onMouseEnter={startPreload}
+      onFocus={startPreload}
+      onTouchStart={startPreload}
       className={`group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-surface-dark transition-colors duration-300 ${accentBorder}`}
     >
       {/* cover */}
       <div
-        onClick={hasExtras ? () => onOpen(project) : undefined}
+        onClick={hasExtras ? () => { preloadProjectAssets(project); onOpen(project) } : undefined}
+        onMouseEnter={startPreload}
         className={`project-cover relative w-full overflow-hidden ${hasExtras ? 'cursor-pointer' : ''}`}
         style={{ aspectRatio: '16/10' }}
       >
@@ -368,13 +377,13 @@ function ProjectModal({ project, onClose }) {
                       }}
                     >
                       <video
-                        src={video} controls preload="metadata"
+                        src={video} controls preload="auto"
                         style={{ width: '100%', maxHeight: '520px', objectFit: 'contain', borderRadius: '24px', background: SURFACE_DARK, display: 'block' }}
                       />
                     </div>
                   ) : (
                     <video
-                      src={video} controls preload="metadata"
+                      src={video} controls preload="auto"
                       style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '18px', background: SURFACE_DARK, border: '1px solid var(--color-ink-faint)' }}
                     />
                   )}
